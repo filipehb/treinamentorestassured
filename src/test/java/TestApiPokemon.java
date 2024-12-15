@@ -164,4 +164,37 @@ public class TestApiPokemon {
             System.out.println(responseAbility.asString());
         });
     }
+
+    @Test
+    public void test7() {
+        Response response =
+                given()
+                        .baseUri("https://pokeapi.co")
+                        .basePath("/api/v2/pokemon/ditto")
+                        .header("Content-Type", "application/json")
+                        .header("Accept", "*/*")
+                        .when()
+                        .get()
+                        .then()
+                        .assertThat()
+                        .statusCode(200)
+                        .extract().response();
+
+        response.jsonPath().getList("abilities.ability.name").forEach(ability -> {
+            Response responseAbility =
+                    given()
+                            .baseUri("https://pokeapi.co")
+                            .basePath("api/v2/ability/" + ability)
+                            .header("Content-Type", "application/json")
+                            .header("Accept", "*/*")
+                            .when()
+                            .get()
+                            .then()
+                            .assertThat()
+                            .statusCode(200)
+                            .extract().response();
+            System.out.println("Ability: " + responseAbility.jsonPath().get("name").toString());
+            System.out.println(responseAbility.jsonPath().get("flavor_text_entries.findAll { it.language.name == \"es\" }.flavor_text").toString());
+        });
+    }
 }
